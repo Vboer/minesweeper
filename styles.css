@@ -2,12 +2,13 @@ h1 {
 color: red;
 }
 p {
-    font-size: 10px;
-    align-self: center;
+    font-size: 80%;
+    padding-top: 12%;
+    margin: 0;
+    text-align:center;
 }
 #field {
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
     column-gap: 1px;
     row-gap: 1px;
     background-color: darkgray;
@@ -16,7 +17,7 @@ p {
     background-color: grey;
 }
 .tile:hover {
-  background-color: #004369;
+  background-color: lightblue;
 }
 
 .open {
