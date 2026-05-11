@@ -1,5 +1,18 @@
 "use strict";
 
+class Tile {
+has_mine = false; 
+opened = false;
+flagged = false;
+number_of_mines_around = 0;
+tile_element;
+static flag_counter = 0;
+static wrong_flags_counter = 0;
+static opened_tiles = 0;
+}
+
+
+
 //setup data
 const config = {
   columns: 10,
@@ -13,12 +26,21 @@ const config = {
   flag_symbol: "|>",
 };
 
-const all_tiles = new Array(config.tile_quantity).fill("");
-const counters = {
-  flag_counter: 0,
-  wrong_flags_counter: 0,
-  opened_tiles: 0
-};
+const all_tiles = new Array(config.tile_quantity).fill(new Tile());
+/*
+tile_shape = {
+has_mine: true | false,
+opened: true | false,
+flagged: true| false,
+number_of_mines_around: int
+tile_element: element div
+}
+render () static method of Tile class updates  
+*/
+
+
+
+
 
 //calculate mines positions
 place_mines(all_tiles, config.mines_quantity);
@@ -48,21 +70,21 @@ function place_mines(arr, mines_quantity) {
   let counter = mines_quantity;
   while (counter > 0) {
     arr_index = (Math.random() * arr.length) | 0;
-    if (arr[arr_index] == 0) {
+    if (arr[arr_index].has_mine == false) {
       counter--;
-      arr[arr_index] = config.mine_symbol;
+      arr[arr_index].has_mine = true;
     }
   }
 }
 function count_mines(arr) {
   arr.map((element, index, array) => {
-    if (element != config.mine_symbol) {
+    if (element.has_mine == false) {
       const indeces_to_check = array_of_tiles_around_tiles(index);
       //count number of mines around the tile
       const number_of_mines_around = indeces_to_check.reduce((sum, element) => {
-        return sum + (arr[element] == config.mine_symbol ? 1 : 0);
+        return sum + (arr[element].has_mine == true ? 1 : 0);
       }, 0);
-      if (number_of_mines_around > 0) arr[index] = number_of_mines_around;
+      if (number_of_mines_around > 0) arr[index].number_of_mines_around = number_of_mines_around;
     }
   });
 }
@@ -101,7 +123,7 @@ function open_cell() {
     this.classList.add("open");
     this.appendChild(mine);
 
-    counters.opened_tiles++;
+    Tile.opened_tiles++;
 
     lose_game(all_tiles, this.id);
     win_game();
@@ -121,11 +143,11 @@ function place_flag() {
     if (this.firstChild) {
       this.removeChild(this.firstChild);
 
-      counters.flag_counter--;
+      Tile.flag_counter--;
 
       if (all_tiles[this.id] != config.mine_symbol)
 
-        counters.wrong_flags_counter--;
+        Tile.wrong_flags_counter--;
         
     } else {
       const flag = document.createElement("p");
@@ -133,9 +155,9 @@ function place_flag() {
       flag.appendChild(text);
       this.appendChild(flag);
 
-      counters.flag_counter++;
+      Tile.flag_counter++;
       if (all_tiles[this.id] != config.mine_symbol)
-        counters.wrong_flags_counter++;
+        Tile.wrong_flags_counter++;
 
       win_game();
     }
@@ -143,9 +165,9 @@ function place_flag() {
 }
 function win_game() {
   if (
-    counters.flag_counter == config.mines_quantity &&
-    counters.wrong_flags_counter == 0 &&
-    counters.opened_tiles + counters.flag_counter == config.tile_quantity
+    Tile.flag_counter == config.mines_quantity &&
+    Tile.wrong_flags_counter == 0 &&
+    Tile.opened_tiles + Tile.flag_counter == config.tile_quantity
   ) {
     end_game("You've won");
   }
